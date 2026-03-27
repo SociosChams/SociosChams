@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚡️Socios Chams👾</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --bg: #0f1419;
+            --card: #1a1f2e;
+            --border: #2d3748;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+        
+        body { background: var(--bg); color: var(--text); line-height: 1.5; }
+        
+        /* NAVBAR */
+        .navbar {
+            background: var(--card); border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem; position: fixed; width: 100%; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;
+        }
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .balance-pill { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2); }
+        .menu-btn { background: var(--border); border: none; color: var(--text); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
+        .dropdown { position: absolute; top: 60px; right: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0.5rem; min-width: 220px; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.4); opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+        .dropdown.active { display: block; opacity: 1; transform: translateY(0); }
+        .dropdown-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text); text-decoration: none; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+        .dropdown-item:hover { background: var(--border); }
+        .dropdown-divider { height: 1px; background: var(--border); margin: 0.5rem 0; }
+        .text-danger { color: var(--danger); }
+        
+        /* CONTAINER & VIEWS */
+        .container { max-width: 1200px; margin: 0 auto; padding: 5rem 1rem 2rem; }
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
+        
+        /* CARDS & FORMS */
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--text-muted); }
+        .form-control, .form-select { width: 100%; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 0.95rem; }
+        .form-control:focus, .form-select:focus { outline: none; border-color: var(--primary); }
+        textarea.form-control { min-height: 120px; resize: vertical; }
+        
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; border: none; cursor: pointer; transition: all 0.25s; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: black; }
+        .btn-google { background: white; color: #333; border: 1px solid #ddd; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+        .btn-block { width: 100%; }
+        
+        /* GRID & PRODUCTS */
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        
+        .product-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: all 0.3s; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
+        .product-card.inactive { opacity: 0.6; filter: grayscale(0.5); }
+        .product-off-badge { background: var(--danger); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; text-align: center; margin: 1rem; font-size: 0.9rem; }
+        .product-image { width: 100%; height: 160px; object-fit: cover; }
+        .product-body { padding: 1.25rem; }
+        .product-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .product-desc { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
+        
+        /* PRICE GRID & STOCK */
+        .price-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+        .price-option { background: var(--bg); border: 2px solid var(--border); border-radius: 10px; padding: 0.75rem; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .price-option:hover, .price-option.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.08); }
+        .price-option .days { font-size: 0.75rem; color: var(--text-muted); }
+        .price-option .price { font-size: 1rem; font-weight: 700; color: var(--primary); }
+        
+        .stock-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.75rem; }
+        .stock-item { flex: 1; text-align: center; padding: 0.5rem; background: var(--bg); border-radius: 8px; }
+        .stock-item .label { color: var(--text-muted); display: block; }
+        .stock-item .count { font-weight: 700; color: var(--success); }
+        .stock-item .count.low { color: var(--danger); }
+        
+        .promo-badge { background: linear-gradient(135deg, var(--warning), #fbbf24); color: black; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; margin-bottom: 0.5rem; }
+        
+        /* KEYS & TABLES */
+        .key-display { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin: 1rem 0; font-family: 'Courier New', monospace; word-break: break-all; position: relative; }
+        .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; }
+        .copy-btn.copied { background: var(--success); }
+        
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; }
+        
+        /* ALERTS & TOAST */
+        .alert { padding: 1rem; border-radius: 10px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+        
+        .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success); color: white; padding: 1rem 2rem; border-radius: 10px; font-weight: 600; z-index: 300; opacity: 0; transition: all 0.4s; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        
+        /* MODALS & TABS */
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; overflow-x: auto; }
+        .tab { padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: var(--text-muted); white-space: nowrap; }
+        .tab.active { background: var(--primary); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; padding: 1rem; opacity: 0; transition: opacity 0.3s; }
+        .modal.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--card); border-radius: 16px; padding: 1.5rem; max-width: 400px; width: 100%; border: 1px solid var(--border); }
+        
+        /* UTILS */
+        .text-center { text-align: center; } .mb-1 { margin-bottom: 0.5rem; } .mb-2 { margin-bottom: 1rem; } .mt-2 { margin-top: 1rem; } .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; } .gap-2 { gap: 0.5rem; }
+        
+        .wa-float { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #25d366; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); z-index: 99; transition: all 0.3s; }
+        .wa-float:hover { transform: scale(1.1) rotate(5deg); }
+        .wa-recharge { background: linear-gradient(135deg, #25d366, #128c7e); color: white; margin-top: 0.5rem; }
+        
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR DÍNAMICA -->
+<nav class="navbar" id="mainNav" style="display: none;">
+    <div class="logo" onclick="app.navigate('dashboard')">
+        <i class="fas fa-key"></i>
+        <span>⚡️Socios Chams👾</span>
+    </div>
+    <div class="nav-right">
+        <div class="balance-pill">
+            <i class="fas fa-wallet"></i> $<span id="navBalance">0.00</span>
+        </div>
+        <button class="menu-btn" onclick="document.getElementById('userMenu').classList.toggle('active')">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <div class="dropdown" id="userMenu">
+        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);">
+            <div style="font-weight: 600;" id="navUsername">Usuario</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);" id="navRole">Rol</div>
+        </div>
+        <div id="adminMenuLink" style="display:none;">
+            <a onclick="app.navigate('admin')" class="dropdown-item"><i class="fas fa-crown"></i> Panel Admin</a>
+        </div>
+        <div id="userMenuLinks">
+            <a onclick="app.navigate('dashboard')" class="dropdown-item"><i class="fas fa-store"></i> Tienda</a>
+            <a onclick="app.navigate('mykeys')" class="dropdown-item"><i class="fas fa-key"></i> Mis Keys</a>
+        </div>
+        <a id="waRechargeLink" href="#" class="dropdown-item wa-recharge" target="_blank">
+            <i class="fab fa-whatsapp"></i> Recargar Saldo
+        </a>
+        <div class="dropdown-divider"></div>
+        <button onclick="app.logout()" class="dropdown-item text-danger" style="width: 100%; background: none; border: none;">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- HOME -->
+    <div id="view-home" class="view-section active">
+        <div class="text-center" style="padding-top: 20vh;">
+            <i class="fas fa-key" style="font-size: 4rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">👾Ventas Chams Pro🐉</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">👾Pagina Ofc Ventas Chams🛸</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button onclick="app.navigate('login')" class="btn btn-primary btn-lg">Iniciar Sesión</button>
+                <button onclick="app.navigate('register')" class="btn" style="background: var(--card); border: 1px solid var(--border);">Crear Cuenta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="view-login" class="view-section">
+        <div style="max-width: 400px; margin: 10vh auto;">
+            <div class="card">
+                <h2 class="text-center mb-2">Iniciar Sesión</h2>
+                <div id="loginAlert"></div>
+                <form id="formLogin">
+                    <div class="form-group">
+                        <input type="text" id="logUsername" class="form-control" placeholder="Usuario" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="logPassword" class="form-control" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+                </form>
+                
+                <div style="display:flex; align-items:center; margin: 1.5rem 0;">
+                    <div style="flex:1; height:1px; background:var(--border);"></div>
+                    <div style="padding:0 1rem; color:var(--text-muted); font-size:0.875rem;">O</div>
+                    <div style="flex:1; height:1px; background:var(--border);"></div>
+                </div>
+                
+                <button type="button" onclick="app.fakeGoogleLogin()" class="btn btn-google btn-block mb-2">
+                    <i class="fab fa-google" style="color:#DB4437;"></i> Continuar con Google
+                </button>
+
+                <p class="text-center mt-2" style="color: var(--text-muted); font-size: 0.875rem;">
+                    ¿No tienes cuenta? <a href="#" onclick="app.navigate('register')" style="color: var(--primary);">Regístrate</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="view-register" class="view-section">
+        <div style="max-width: 400px; margin: 10vh auto;">
+            <div class="card">
+                <h2 class="text-center mb-2">Crear Cuenta</h2>
+                <div id="regAlert"></div>
+                <form id="formRegister">
+                    <div class="form-group">
+                        <input type="text" id="regUsername" class="form-control" placeholder="Usuario" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="regEmail" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="regPassword" class="form-control" placeholder="Contraseña (mín 6)" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Crear Cuenta</button>
+                </form>
+                <p class="text-center mt-2" style="color: var(--text-muted); font-size: 0.875rem;">
+                    ¿Ya tienes cuenta? <a href="#" onclick="app.navigate('login')" style="color: var(--primary);">Inicia sesión</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD (TIENDA) -->
+    <div id="view-dashboard" class="view-section">
+        <h2 style="margin-bottom: 1.5rem;">Tienda de Keys</h2>
+        <div id="dashboardAlert"></div>
+        <div class="grid-2" id="dashboardProducts"></div>
+    </div>
+
+    <!-- MIS KEYS -->
+    <div id="view-mykeys" class="view-section">
+        <h2 style="margin-bottom: 1.5rem;">Mis Keys</h2>
+        <div id="mykeysContainer"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="view-admin" class="view-section">
+        <h2 style="margin-bottom: 1.5rem;">Panel de Administración 👑</h2>
+        <div id="adminAlert"></div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="app.showAdminTab('users')">Usuarios</div>
+            <div class="tab" onclick="app.showAdminTab('products')">Productos</div>
+            <div class="tab" onclick="app.showAdminTab('stock')">Añadir Stock</div>
+            <div class="tab" onclick="app.showAdminTab('keys')">Inventario</div>
+        </div>
+
+        <div id="admin-tab-users" class="tab-content active">
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Usuario</th><th>Email</th><th>Saldo</th><th>Estado</th><th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-tab-products" class="tab-content">
+            <div class="grid-2" id="adminProductsGrid"></div>
+        </div>
+
+        <div id="admin-tab-stock" class="tab-content">
+            <div class="card" style="max-width: 500px; margin: 0 auto;">
+                <h3 class="card-title"><i class="fas fa-plus-circle"></i> Añadir Keys (Bulk)</h3>
+                <form id="formBulkStock">
+                    <div class="form-group">
+                        <label class="form-label">Producto</label>
+                        <select id="bulkProductId" class="form-select" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Duración</label>
+                        <select id="bulkDuration" class="form-select" required>
+                            <option value="1">1 Día</option><option value="7">7 Días</option>
+                            <option value="15">15 Días</option><option value="30">30 Días</option>
+                            <option value="365">365 Días</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Keys (una por línea)</label>
+                        <textarea id="bulkKeys" class="form-control" rows="10" placeholder="XXXX-XXXX\nYYYY-YYYY" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-upload"></i> Añadir Keys</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="admin-tab-keys" class="tab-content">
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th><th>Key</th><th>Días</th><th>Estado</th><th>Comprador</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminKeysTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<a href="https://wa.me/+50557982464" class="wa-float" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- MODALS -->
+<div class="modal" id="balanceModal">
+    <div class="modal-content">
+        <h3 class="mb-2" id="balanceTitle">Modificar Saldo</h3>
+        <form id="formBalance">
+            <div class="form-group">
+                <label class="form-label">Monto</label>
+                <input type="number" step="0.01" id="balanceAmount" class="form-control" placeholder="0.00" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Confirmar</button>
+            <button type="button" class="btn btn-block mt-2" onclick="app.closeModal('balanceModal')" style="background: var(--border);">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <h3 class="mb-2" style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Confirmar</h3>
+        <p class="mb-2">¿Seguro de eliminar al usuario <strong id="deleteUsername"></strong>?</p>
+        <button type="button" class="btn btn-danger btn-block" onclick="app.executeDeleteUser()">Sí, Eliminar</button>
+        <button type="button" class="btn btn-block mt-2" onclick="app.closeModal('deleteModal')" style="background: var(--border);">Cancelar</button>
+    </div>
+</div>
+
+<!-- LÓGICA DE LA APLICACIÓN SPA (JavaScript Mock de la Base de Datos) -->
+<script>
+const DB_KEY = 'chams_db_v1';
+const CURRENT_USER_KEY = 'chams_current_user';
+
+const defaultProducts =[
+    {id: 1, name: 'BR Mods PC', description: 'Mod menu premium para PC', image_url: 'https://i.postimg.cc/5yXDFYMZ/br-mods-icon.jpg', price_1d: 1.20, price_7d: 3.50, price_15d: 6.00, price_30d: 8.00, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 2, name: 'Cuban Mods Store🐉', description: 'Apkmod Con funciones Descaradas⚡️', image_url: 'https://i.postimg.cc/vHQxtYVb/Cubanrage.jpg', price_1d: 0.90, price_7d: 3.00, price_15d: 5.00, price_30d: 7.00, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 3, name: 'Cuban Rage PC🐉', description: 'Producto Super bueno para PC🖥', image_url: 'https://i.postimg.cc/vHQxtYVb/Cubanrage.jpg', price_1d: 1.00, price_7d: 3.50, price_15d: 0, price_30d: 8.00, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 4, name: 'HG Cheats🛡', description: 'ApkMod&Root Combatible con android 10+', image_url: 'https://i.postimg.cc/zDkVBsPx/Hgcheast3.png', price_1d: 0.90, price_7d: 0, price_15d: 0, price_30d: 8.50, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 5, name: 'Drip Client👾', description: 'ApkMod&Root All androids Back Jump', image_url: 'https://i.postimg.cc/C5JGszMh/Dripclientv4-5.jpg', price_1d: 1.00, price_7d: 3.50, price_15d: 0, price_30d: 8.00, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 6, name: 'Pato Team Verde🦆💚', description: 'Equipo verde exclusivo', image_url: 'https://i.postimg.cc/Jhbgxc7Y/PATO-TEAM.png', price_1d: 0, price_7d: 0, price_15d: 0, price_30d: 9.00, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 7, name: 'Pato Team Azul🦆💙', description: 'Equipo azul exclusivo Fullk', image_url: 'https://i.postimg.cc/Jhbgxc7Y/PATO-TEAM.png', price_1d: 0, price_7d: 0, price_15d: 0, price_30d: 9.00, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 8, name: 'Proxy iOS🍎', description: 'Proxy para dispositivos iOS Aim Pecho', image_url: 'https://i.postimg.cc/pdN2kC6L/images-(3).jpg', price_1d: 3.50, price_7d: 5.00, price_15d: 0, price_30d: 9.50, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 9, name: 'Holograma Vip🔥', description: 'Holograma Verde 💚 100% fullk', image_url: 'https://i.postimg.cc/pVnMczKZ/Gemini-Generated-Image-7lawb87lawb87law.png', price_1d: 4.00, price_7d: 0, price_15d: 0, price_30d: 0, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 10, name: 'Flourite iOS sin gbox💎', description: 'iOs BackJump agg senecesita Gbox', image_url: 'https://i.postimg.cc/hhFTbwN1/file-00000000a7f871f589f2f7914deaa800.png', price_1d: 2.50, price_7d: 8.00, price_15d: 0, price_30d: 15.00, price_365d: 0, promo_active: 0, promo_type: '', active: 1},
+    {id: 11, name: 'Certificado de Gbox📜', description: 'Certificado oficial para Gbox', image_url: 'https://i.postimg.cc/26cxv0kr/Gbox-1.jpg', price_1d: 0, price_7d: 0, price_15d: 0, price_30d: 20.00, price_365d: 45.00, promo_active: 0, promo_type: '', active: 1}
+];
+
+// Instancia global
+const app = {
+    db: { users: [], products: [], keys_stock: [], purchases:[] },
+    currentUser: null,
+    tempData: {},
+
+    init() {
+        this.loadDB();
+        
+        // Manejo de clicks fuera de dropdowns o modales
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('userMenu');
+            if (menu && !menu.contains(e.target) && !e.target.closest('.menu-btn')) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // Configurar Formularios
+        document.getElementById('formLogin').onsubmit = (e) => { e.preventDefault(); this.login(); };
+        document.getElementById('formRegister').onsubmit = (e) => { e.preventDefault(); this.register(); };
+        document.getElementById('formBulkStock').onsubmit = (e) => { e.preventDefault(); this.adminAddBulkStock(); };
+        document.getElementById('formBalance').onsubmit = (e) => { e.preventDefault(); this.executeBalance(); };
+
+        // Enrutamiento Inicial
+        let hash = window.location.hash.replace('#', '') || 'home';
+        if (this.currentUser) hash = (hash === 'home' || hash === 'login' || hash === 'register') ? (this.currentUser.is_admin ? 'admin' : 'dashboard') : hash;
+        else hash = (hash !== 'login' && hash !== 'register') ? 'home' : hash;
+        
+        this.navigate(hash);
+    },
+
+    loadDB() {
+        let saved = localStorage.getItem(DB_KEY);
+        if (saved) {
+            this.db = JSON.parse(saved);
+        } else {
+            // Admin por defecto
+            this.db.users.push({ id: 1, username: 'Chams00062', email: 'admin@admin.com', password: '955', balance: 999999, is_banned: 0, is_admin: 1, date: new Date().toISOString() });
+            this.db.products = [...defaultProducts];
+            this.saveDB();
+        }
+        let userSaved = sessionStorage.getItem(CURRENT_USER_KEY) || localStorage.getItem(CURRENT_USER_KEY);
+        if (userSaved) {
+            let u = JSON.parse(userSaved);
+            this.currentUser = this.db.users.find(x => x.id === u.id) || null; // recargar info fresca
+        }
+    },
+
+    saveDB() {
+        localStorage.setItem(DB_KEY, JSON.stringify(this.db));
+        if (this.currentUser) {
+            this.currentUser = this.db.users.find(x => x.id === this.currentUser.id);
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(this.currentUser));
+            this.updateNav();
+        }
+    },
+
+    navigate(page) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById('view-' + page);
+        if(target) target.classList.add('active');
+        window.location.hash = page;
+
+        document.getElementById('mainNav').style.display = this.currentUser ? 'flex' : 'none';
+        
+        this.clearAlerts();
+
+        if (this.currentUser) {
+            this.updateNav();
+            if (page === 'dashboard') this.renderDashboard();
+            if (page === 'mykeys') this.renderMyKeys();
+            if (page === 'admin' && this.currentUser.is_admin) this.renderAdmin();
+            if (page === 'admin' && !this.currentUser.is_admin) this.navigate('dashboard');
+        }
+    },
+
+    updateNav() {
+        if(!this.currentUser) return;
+        document.getElementById('navBalance').textContent = parseFloat(this.currentUser.balance).toFixed(2);
+        document.getElementById('navUsername').textContent = this.currentUser.username;
+        document.getElementById('navRole').textContent = this.currentUser.is_admin ? 'Administrador' : 'Usuario';
+        
+        document.getElementById('adminMenuLink').style.display = this.currentUser.is_admin ? 'block' : 'none';
+        document.getElementById('userMenuLinks').style.display = this.currentUser.is_admin ? 'none' : 'block';
+        document.getElementById('waRechargeLink').href = `https://wa.me/+50557982464?text=Hola,%20quiero%20recargar%20saldo%20a%20mi%20cuenta%20${encodeURIComponent(this.currentUser.username)}`;
+    },
+
+    clearAlerts() {
+        ['loginAlert','regAlert','dashboardAlert','adminAlert'].forEach(id => document.getElementById(id).innerHTML = '');
+    },
+
+    showAlert(containerId, msg, type='error') {
+        document.getElementById(containerId).innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+    },
+
+    showToast(msg) {
+        let t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    },
+
+    copyText(btn, text) {
+        navigator.clipboard.writeText(text).then(() => {
+            let original = btn.innerHTML;
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+            this.showToast('Copiado al portapapeles');
+            setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = original; }, 2000);
+        });
+    },
+
+    // --- AUTH ---
+    login() {
+        const u = document.getElementById('logUsername').value;
+        const p = document.getElementById('logPassword').value;
+        const user = this.db.users.find(x => x.username === u && x.password === p);
+        
+        if (user) {
+            if (user.is_banned) {
+                this.showAlert('loginAlert', 'Cuenta suspendida');
+            } else {
+                this.currentUser = user;
+                this.saveDB();
+                this.navigate(user.is_admin ? 'admin' : 'dashboard');
+                document.getElementById('formLogin').reset();
+            }
+        } else {
+            this.showAlert('loginAlert', 'Credenciales incorrectas');
+        }
+    },
+
+    fakeGoogleLogin() {
+        // Simulador de inicio de sesión social para satisfacer requisito estético
+        const u = "UsuarioGoogle_" + Math.floor(Math.random() * 1000);
+        const newUser = {
+            id: Date.now(),
+            username: u,
+            email: u.toLowerCase() + '@gmail.com',
+            password: '123', // Dummy
+            balance: 0,
+            is_banned: 0,
+            is_admin: 0,
+            date: new Date().toISOString()
+        };
+        this.db.users.push(newUser);
+        this.currentUser = newUser;
+        this.saveDB();
+        this.navigate('dashboard');
+        this.showToast('Iniciaste sesión con Google');
+    },
+
+    register() {
+        const u = document.getElementById('regUsername').value;
+        const e = document.getElementById('regEmail').value;
+        const p = document.getElementById('regPassword').value;
+
+        if (this.db.users.some(x => x.username === u || x.email === e)) {
+            this.showAlert('regAlert', 'El usuario o email ya existe');
+            return;
+        }
+
+        this.db.users.push({
+            id: Date.now(),
+            username: u,
+            email: e,
+            password: p,
+            balance: 0,
+            is_banned: 0,
+            is_admin: 0,
+            date: new Date().toISOString()
+        });
+        this.saveDB();
+        document.getElementById('formRegister').reset();
+        this.navigate('login');
+        this.showAlert('loginAlert', 'Cuenta creada exitosamente. Inicia sesión.', 'success');
+    },
+
+    logout() {
+        this.currentUser = null;
+        localStorage.removeItem(CURRENT_USER_KEY);
+        sessionStorage.removeItem(CURRENT_USER_KEY);
+        this.navigate('home');
+    },
+
+    // --- TIENDA ---
+    renderDashboard() {
+        const container = document.getElementById('dashboardProducts');
+        let html = '';
+
+        this.db.products.forEach(p => {
+            if (!p.active) {
+                html += `
+                <div class="product-card inactive">
+                    <img src="${p.image_url}" class="product-image">
+                    <div class="product-body">
+                        <div class="product-off-badge"><i class="fas fa-ban"></i> PRODUCTO OFF</div>
+                        <h3 class="product-title">${p.name}</h3>
+                        <p class="product-desc">${p.description}</p>
+                    </div>
+                </div>`;
+                return;
+            }
+
+            // Calcular stock
+            let s1 = this.db.keys_stock.filter(k => k.product_id===p.id && k.duration_days===1 && k.is_sold===0).length;
+            let s7 = this.db.keys_stock.filter(k => k.product_id===p.id && k.duration_days===7 && k.is_sold===0).length;
+            let s15 = this.db.keys_stock.filter(k => k.product_id===p.id && k.duration_days===15 && k.is_sold===0).length;
+            let s30 = this.db.keys_stock.filter(k => k.product_id===p.id && k.duration_days===30 && k.is_sold===0).length;
+            let s365 = this.db.keys_stock.filter(k => k.product_id===p.id && k.duration_days===365 && k.is_sold===0).length;
+
+            let promoHtml = p.promo_active ? `<div class="promo-badge"><i class="fas fa-tag"></i> ${p.promo_type.toUpperCase()}</div>` : '';
+            
+            let stockHtml = `<div class="stock-bar">`;
+            if(p.price_1d>0) stockHtml += `<div class="stock-item"><span class="label">1D</span><span class="count ${s1===0?'low':''}">${s1}</span></div>`;
+            if(p.price_7d>0) stockHtml += `<div class="stock-item"><span class="label">7D</span><span class="count ${s7===0?'low':''}">${s7}</span></div>`;
+            if(p.price_15d>0) stockHtml += `<div class="stock-item"><span class="label">15D</span><span class="count ${s15===0?'low':''}">${s15}</span></div>`;
+            if(p.price_30d>0) stockHtml += `<div class="stock-item"><span class="label">30D</span><span class="count ${s30===0?'low':''}">${s30}</span></div>`;
+            if(p.price_365d>0) stockHtml += `<div class="stock-item"><span class="label">1A</span><span class="count ${s365===0?'low':''}">${s365}</span></div>`;
+            stockHtml += `</div>`;
+
+            let priceHtml = `<div class="price-grid" id="prices-${p.id}">`;
+            if(p.price_1d>0) priceHtml += `<div class="price-option" onclick="app.selectPrice(${p.id}, 1, ${p.price_1d})"><div class="days">1 Día</div><div class="price">$${parseFloat(p.price_1d).toFixed(2)}</div></div>`;
+            if(p.price_7d>0) priceHtml += `<div class="price-option" onclick="app.selectPrice(${p.id}, 7, ${p.price_7d})"><div class="days">7 Días</div><div class="price">$${parseFloat(p.price_7d).toFixed(2)}</div></div>`;
+            if(p.price_15d>0) priceHtml += `<div class="price-option" onclick="app.selectPrice(${p.id}, 15, ${p.price_15d})"><div class="days">15 Días</div><div class="price">$${parseFloat(p.price_15d).toFixed(2)}</div></div>`;
+            if(p.price_30d>0) priceHtml += `<div class="price-option" onclick="app.selectPrice(${p.id}, 30, ${p.price_30d})"><div class="days">30 Días</div><div class="price">$${parseFloat(p.price_30d).toFixed(2)}</div></div>`;
+            if(p.price_365d>0) priceHtml += `<div class="price-option" onclick="app.selectPrice(${p.id}, 365, ${p.price_365d})"><div class="days">1 Año</div><div class="price">$${parseFloat(p.price_365d).toFixed(2)}</div></div>`;
+            priceHtml += `</div>`;
+
+            html += `
+            <div class="product-card">
+                <img src="${p.image_url}" class="product-image">
+                <div class="product-body">
+                    ${promoHtml}
+                    <h3 class="product-title">${p.name}</h3>
+                    <p class="product-desc">${p.description}</p>
+                    ${stockHtml}
+                    ${priceHtml}
+                    <button id="btnBuy-${p.id}" class="btn btn-primary btn-block" disabled>
+                        <i class="fas fa-shopping-cart"></i> Selecciona duración
+                    </button>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    },
+
+    selectPrice(productId, days, price) {
+        const container = document.getElementById(`prices-${productId}`);
+        container.querySelectorAll('.price-option').forEach(o => o.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        
+        const btn = document.getElementById(`btnBuy-${productId}`);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Comprar ($${parseFloat(price).toFixed(2)})`;
+        btn.onclick = () => this.buyKey(productId, days, price);
+    },
+
+    buyKey(productId, duration, price) {
+        if (this.currentUser.balance < price) {
+            this.showAlert('dashboardAlert', 'Saldo insuficiente. Contacta al admin para recargar.');
+            return;
+        }
+
+        let key = this.db.keys_stock.find(k => k.product_id === productId && k.duration_days === duration && k.is_sold === 0);
+        if (!key) {
+            this.showAlert('dashboardAlert', 'No hay stock disponible para esa duración.');
+            return;
+        }
+
+        // Ejecutar compra
+        this.currentUser.balance -= price;
+        key.is_sold = 1;
+        key.sold_to = this.currentUser.id;
+        key.sold_at = new Date().toISOString();
+
+        let prod = this.db.products.find(x => x.id === productId);
+        let promo = (prod.promo_active && prod.promo_type === '2x1') ? '2x1' : '';
+
+        this.db.purchases.push({
+            id: Date.now(),
+            user_id: this.currentUser.id,
+            product_id: productId,
+            key_id: key.id,
+            price_paid: price,
+            promo_applied: promo,
+            purchased_at: new Date().toISOString()
+        });
+
+        this.saveDB();
+        this.renderDashboard();
+        
+        document.getElementById('dashboardAlert').innerHTML = `
+        <div class="alert alert-success" style="flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-check-circle"></i> <span>¡Compra exitosa!</span>
+            </div>
+            <div class="key-display" style="width: 100%; margin-top: 1rem; margin-bottom: 0;">
+                <span>${key.key_value}</span>
+                <button class="copy-btn" onclick="app.copyText(this, '${key.key_value}')"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+        </div>`;
+    },
+
+    renderMyKeys() {
+        const container = document.getElementById('mykeysContainer');
+        const myPurchases = this.db.purchases.filter(p => p.user_id === this.currentUser.id).reverse();
+
+        if (myPurchases.length === 0) {
+            container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-key"></i>
+                <h3>No tienes keys compradas</h3>
+                <p>Ve a la tienda para comprar tus primeras keys</p>
+                <button onclick="app.navigate('dashboard')" class="btn btn-primary btn-sm mt-2">Ir a la tienda</button>
+            </div>`;
+            return;
+        }
+
+        let html = '<div class="grid-2">';
+        myPurchases.forEach(pur => {
+            let key = this.db.keys_stock.find(k => k.id === pur.key_id);
+            let prod = this.db.products.find(p => p.id === pur.product_id);
+            let date = new Date(pur.purchased_at).toLocaleString();
+            
+            html += `
+            <div class="card">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 style="font-weight: 600;">${prod ? prod.name : 'Producto Eliminado'}</h3>
+                    ${pur.promo_applied ? `<span class="promo-badge">${pur.promo_applied.toUpperCase()}</span>` : ''}
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                    <i class="fas fa-clock"></i> ${key ? key.duration_days : '?'} días • 
+                    <i class="fas fa-calendar"></i> ${date}
+                </p>
+                <div class="key-display">
+                    <span>${key ? key.key_value : 'Key no encontrada'}</span>
+                    <button class="copy-btn" onclick="app.copyText(this, '${key ? key.key_value : ''}')">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    },
+
+    // --- ADMIN PANEL ---
+    showAdminTab(tab) {
+        document.querySelectorAll('#view-admin .tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#view-admin .tab-content').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('admin-tab-' + tab).classList.add('active');
+    },
+
+    renderAdmin() {
+        // Users Table
+        const tUsers = document.getElementById('adminUsersTable');
+        tUsers.innerHTML = this.db.users.filter(u => !u.is_admin).map(u => `
+            <tr>
+                <td>${u.username}</td>
+                <td>${u.email}</td>
+                <td>$${parseFloat(u.balance).toFixed(2)}</td>
+                <td>${u.is_banned ? '<span style="color:var(--danger);"><i class="fas fa-ban"></i> Baneado</span>' : '<span style="color:var(--success);"><i class="fas fa-check-circle"></i> Activo</span>'}</td>
+                <td>
+                    <button class="btn btn-sm btn-success" onclick="app.openBalanceModal(${u.id}, 'add')" title="Agregar saldo"><i class="fas fa-plus"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="app.openBalanceModal(${u.id}, 'remove')" title="Quitar saldo"><i class="fas fa-minus"></i></button>
+                    <button class="btn btn-sm btn-warning" onclick="app.toggleBanUser(${u.id})" title="${u.is_banned ? 'Desbanear' : 'Banear'}"><i class="fas fa-${u.is_banned ? 'unlock' : 'ban'}"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="app.confirmDeleteUser(${u.id}, '${u.username}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Products Editor
+        const pGrid = document.getElementById('adminProductsGrid');
+        pGrid.innerHTML = this.db.products.map(p => `
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-box"></i> ${p.name}
+                    <button class="btn btn-sm ${p.active ? 'btn-danger' : 'btn-success'}" style="margin-left:auto;" onclick="app.toggleProductActive(${p.id})">
+                        ${p.active ? 'Desactivar' : 'Activar'}
+                    </button>
+                </h3>
+                <div class="grid-2">
+                    <div class="form-group"><label class="form-label">1 Día</label><input type="number" step="0.01" id="p1-${p.id}" class="form-control" value="${p.price_1d}"></div>
+                    <div class="form-group"><label class="form-label">7 Días</label><input type="number" step="0.01" id="p7-${p.id}" class="form-control" value="${p.price_7d}"></div>
+                    <div class="form-group"><label class="form-label">15 Días</label><input type="number" step="0.01" id="p15-${p.id}" class="form-control" value="${p.price_15d}"></div>
+                    <div class="form-group"><label class="form-label">30 Días</label><input type="number" step="0.01" id="p30-${p.id}" class="form-control" value="${p.price_30d}"></div>
+                    <div class="form-group"><label class="form-label">365 Días</label><input type="number" step="0.01" id="p365-${p.id}" class="form-control" value="${p.price_365d||0}"></div>
+                </div>
+                <button onclick="app.updatePrices(${p.id})" class="btn btn-primary btn-block btn-sm mb-2"><i class="fas fa-save"></i> Guardar Precios</button>
+                
+                <div style="border-top: 1px solid var(--border); padding-top:1rem;">
+                    <label class="form-label"><i class="fas fa-tag"></i> Promoción</label>
+                    <div class="flex gap-2">
+                        <select class="form-select" id="promo-${p.id}" style="flex: 1;">
+                            <option value="">Sin promo</option>
+                            <option value="2x1" ${p.promo_type==='2x1'?'selected':''}>2x1</option>
+                            <option value="50off" ${p.promo_type==='50off'?'selected':''}>50% OFF</option>
+                        </select>
+                        <button class="btn btn-success btn-sm" onclick="app.togglePromo(${p.id}, 1)">ON</button>
+                        <button class="btn btn-danger btn-sm" onclick="app.togglePromo(${p.id}, 0)">OFF</button>
+                    </div>
+                    ${p.promo_active ? `<span class="promo-badge mt-2"><i class="fas fa-fire"></i> ACTIVA: ${p.promo_type.toUpperCase()}</span>` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        // Stock Form Fill
+        document.getElementById('bulkProductId').innerHTML = this.db.products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+        // Inventory
+        const tKeys = document.getElementById('adminKeysTable');
+        tKeys.innerHTML = [...this.db.keys_stock].reverse().slice(0, 50).map(k => {
+            let p = this.db.products.find(x => x.id === k.product_id);
+            let u = k.sold_to ? this.db.users.find(x => x.id === k.sold_to) : null;
+            return `
+            <tr style="${k.is_sold ? 'opacity:0.6;' : ''}">
+                <td>${p ? p.name : 'Desc'}</td>
+                <td><code>${k.key_value.substring(0,15)}...</code></td>
+                <td>${k.duration_days} d</td>
+                <td>${k.is_sold ? '<span style="color:var(--danger);">Vendida</span>' : '<span style="color:var(--success);">Disponible</span>'}</td>
+                <td>${u ? u.username : '-'}</td>
+            </tr>`;
+        }).join('');
+    },
+
+    openBalanceModal(userId, action) {
+        this.tempData.balanceUserId = userId;
+        this.tempData.balanceAction = action;
+        document.getElementById('balanceTitle').innerHTML = action === 'add' ? '<i class="fas fa-plus"></i> Añadir Saldo' : '<i class="fas fa-minus"></i> Quitar Saldo';
+        document.getElementById('balanceAmount').value = '';
+        document.getElementById('balanceModal').classList.add('active');
+    },
+
+    executeBalance() {
+        let amt = parseFloat(document.getElementById('balanceAmount').value);
+        if(isNaN(amt) || amt <= 0) return;
+        let u = this.db.users.find(x => x.id === this.tempData.balanceUserId);
+        if(u) {
+            if(this.tempData.balanceAction === 'add') u.balance += amt;
+            else {
+                if(u.balance < amt) { alert('El usuario no tiene suficiente saldo'); return; }
+                u.balance -= amt;
+            }
+            this.saveDB();
+            this.renderAdmin();
+            this.closeModal('balanceModal');
+            this.showToast('Saldo actualizado');
+        }
+    },
+
+    toggleBanUser(userId) {
+        let u = this.db.users.find(x => x.id === userId);
+        if(u) { u.is_banned = u.is_banned ? 0 : 1; this.saveDB(); this.renderAdmin(); }
+    },
+
+    confirmDeleteUser(userId, username) {
+        this.tempData.deleteUserId = userId;
+        document.getElementById('deleteUsername').textContent = username;
+        document.getElementById('deleteModal').classList.add('active');
+    },
+
+    executeDeleteUser() {
+        let id = this.tempData.deleteUserId;
+        this.db.purchases = this.db.purchases.filter(p => p.user_id !== id);
+        this.db.keys_stock.forEach(k => { if(k.sold_to === id) { k.is_sold = 0; k.sold_to = null; k.sold_at = null; }});
+        this.db.users = this.db.users.filter(u => u.id !== id);
+        this.saveDB();
+        this.renderAdmin();
+        this.closeModal('deleteModal');
+        this.showToast('Usuario eliminado y sus keys liberadas');
+    },
+
+    updatePrices(pId) {
+        let p = this.db.products.find(x => x.id === pId);
+        if(p) {
+            p.price_1d = parseFloat(document.getElementById(`p1-${pId}`).value) || 0;
+            p.price_7d = parseFloat(document.getElementById(`p7-${pId}`).value) || 0;
+            p.price_15d = parseFloat(document.getElementById(`p15-${pId}`).value) || 0;
+            p.price_30d = parseFloat(document.getElementById(`p30-${pId}`).value) || 0;
+            p.price_365d = parseFloat(document.getElementById(`p365-${pId}`).value) || 0;
+            this.saveDB();
+            this.showToast('Precios actualizados');
+        }
+    },
+
+    togglePromo(pId, active) {
+        let p = this.db.products.find(x => x.id === pId);
+        if(p) {
+            let type = document.getElementById(`promo-${pId}`).value;
+            if(active && !type) { alert('Selecciona tipo de promo'); return; }
+            p.promo_active = active;
+            p.promo_type = type;
+            this.saveDB();
+            this.renderAdmin();
+            this.showToast('Promoción actualizada');
+        }
+    },
+
+    toggleProductActive(pId) {
+        let p = this.db.products.find(x => x.id === pId);
+        if(p) {
+            p.active = p.active ? 0 : 1;
+            this.saveDB();
+            this.renderAdmin();
+        }
+    },
+
+    adminAddBulkStock() {
+        let pId = parseInt(document.getElementById('bulkProductId').value);
+        let days = parseInt(document.getElementById('bulkDuration').value);
+        let keysText = document.getElementById('bulkKeys').value;
+        
+        let keysArray = keysText.split('\n').map(k => k.trim()).filter(k => k !== '');
+        let count = 0;
+        
+        keysArray.forEach(val => {
+            this.db.keys_stock.push({
+                id: Date.now() + count,
+                product_id: pId,
+                key_value: val,
+                duration_days: days,
+                is_sold: 0,
+                sold_to: null,
+                sold_at: null,
+                created_at: new Date().toISOString()
+            });
+            count++;
+        });
+        
+        this.saveDB();
+        this.renderAdmin();
+        document.getElementById('formBulkStock').reset();
+        this.showAlert('adminAlert', `Se añadieron ${count} keys correctamente.`, 'success');
+    },
+
+    closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+};
+
+// Arrancar App
+window.onload = () => app.init();
+</script>
+
+</body>
+</html>
